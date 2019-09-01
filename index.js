@@ -2,8 +2,6 @@
 
 // https://blog.logrocket.com/websockets-tutorial-how-to-go-real-time-with-node-and-react-8e4693fbf843/
 
-console.log(process.env);
-
 const PORT = process.env.PORT || 8000;
 const webSocketServer = require('websocket').server;
 
@@ -65,7 +63,7 @@ function broadcast() {
   }
 }
 
-function process(payload, userID) {
+function processMessage(payload, userID) {
   if (payload.type === 'reset') {
     game = {
       players: [
@@ -117,7 +115,7 @@ wsServer.on('request', function(request) {
   connection.on('message', (message) => {
     let payload = JSON.parse(message.utf8Data);
     // console.log(payload)
-    process(payload, userID);
+    processMessage(payload, userID);
   });
 
   connection.on('close', () => {
