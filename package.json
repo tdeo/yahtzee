@@ -1,0 +1,14 @@
+{
+  "name": "yahtzee",
+  "version": "1.0.0",
+  "description": "Yahtzee websocket server",
+  "main": "index.js",
+  "author": "Thierry Deo",
+  "license": "MIT",
+  "dependencies": {
+    "websocket": "^1.0.29"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.1"
+  }
+}
