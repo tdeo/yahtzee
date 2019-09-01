@@ -2,14 +2,14 @@
 
 // https://blog.logrocket.com/websockets-tutorial-how-to-go-real-time-with-node-and-react-8e4693fbf843/
 
-const webSocketsServerPort = 8000;
+const PORT = process.env.PORT || 8000;
 const webSocketServer = require('websocket').server;
 
 const http = require('http');
 
 // Spinning the http server and the websocket server.
 const server = http.createServer();
-server.listen(webSocketsServerPort);
+server.listen(PORT);
 
 const wsServer = new webSocketServer({
   httpServer: server
