@@ -5,6 +5,9 @@
   "main": "index.js",
   "author": "Thierry Deo",
   "license": "MIT",
+  "scripts": {
+    "start": "node ."
+  },
   "dependencies": {
     "websocket": "^1.0.29"
   },
