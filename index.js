@@ -38,6 +38,10 @@ function nextPlayer() {
       continue;
     }
 
+    if (Object.keys(p.score).length >= 14) {
+      continue;
+    }
+
     let c = Object.keys(p.score).length
     if (c < min) {
       min = c;
