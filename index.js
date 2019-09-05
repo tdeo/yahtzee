@@ -34,9 +34,6 @@ function nextPlayer() {
   let r = null;
   for (let i = 0; i < game.players.length; i++) {
     let p = game.players[i]
-    if (!p.id) {
-      continue;
-    }
 
     if (Object.keys(p.score).length >= 14) {
       continue;
@@ -45,7 +42,7 @@ function nextPlayer() {
     let c = Object.keys(p.score).length
     if (c < min) {
       min = c;
-      r = p.id;
+      r = p.id || null;
     }
   }
   return r;
@@ -56,6 +53,16 @@ function broadcast() {
     game.currentRoll = []
     game.currentPlayer = nextPlayer();
   }
+
+  for (let i = 0; i < game.players.length; i++) {
+    let p = game.players[i];
+    if (!(p.id) in clients) {
+      delete p.id;
+    }
+  }
+
+  console.log(game);
+
   for (let userID in clients) {
     let idx = game.players.findIndex(e => e.id === userID);
     if (idx !== -1) {
@@ -111,14 +118,13 @@ wsServer.on('request', function(request) {
 
   const connection = request.accept(null, request.origin);
   clients[userID] = connection;
-
   console.log('Client ' + userID + ' connected')
 
+  broadcast();
   connection.send(JSON.stringify(game));
 
   connection.on('message', (message) => {
     let payload = JSON.parse(message.utf8Data);
-    // console.log(payload)
     processMessage(payload, userID);
   });
 
