@@ -17,10 +17,7 @@ const wsServer = new webSocketServer({
 
 let clients = {};
 let game = {
-  players: [
-    { name: 'Titi', score: {} },
-    { name: 'Val', score: {} },
-  ],
+  players: [],
   currentRoll: [],
   currentPlayer: null,
 };
@@ -65,22 +62,18 @@ function broadcast() {
 
   for (let userID in clients) {
     let idx = game.players.findIndex(e => e.id === userID);
+    let payload = { ...game };
     if (idx !== -1) {
-      clients[userID].send(JSON.stringify({
-        me: userID,
-        ...game
-      }));
+      payload.me = userID;
     }
+    clients[userID].send(JSON.stringify(payload));
   }
 }
 
 function processMessage(payload, userID) {
   if (payload.type === 'reset') {
     game = {
-      players: [
-        { name: 'Titi', score: {} },
-        { name: 'Val', score: {} },
-      ],
+      players: [],
       currentRoll: [],
       currentPlayer: null,
     };
@@ -97,9 +90,15 @@ function processMessage(payload, userID) {
     let newRoll = []
     for (let i = 0; i < 5; i++) {
       if (payload.blocked[i]) {
-        newRoll[i] = game.currentRoll[game.currentRoll.length - 1][i];
+        newRoll[i] = {
+          value: game.currentRoll[game.currentRoll.length - 1][i].value,
+          blocked: true,
+        };
       } else {
-        newRoll[i] = rand();
+        newRoll[i] = {
+          value: rand(),
+          blocked: false,
+        };
       }
     }
     game.currentRoll.push(newRoll);
@@ -114,7 +113,7 @@ const getUniqueID = () => {
 };
 
 wsServer.on('request', function(request) {
-  var userID = getUniqueID();
+  const userID = getUniqueID();
 
   const connection = request.accept(null, request.origin);
   clients[userID] = connection;
@@ -130,9 +129,9 @@ wsServer.on('request', function(request) {
 
   connection.on('close', () => {
     let idx = game.players.findIndex(e => e.id === userID);
+    delete clients[userID];
     if (idx !== -1) {
       delete game.players[idx].id;
-      delete clients[userID];
     }
   })
 });
