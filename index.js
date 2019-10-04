@@ -89,15 +89,17 @@ function processMessage(payload, userID) {
   } else if (payload.type === 'roll') {
     let newRoll = []
     for (let i = 0; i < 5; i++) {
+      let prevRoll = game.currentRoll[game.currentRoll.length - 1];
+      if (prevRoll) {
+        prevRoll[i].blocked = payload.blocked[i];
+      }
       if (payload.blocked[i]) {
         newRoll[i] = {
           value: game.currentRoll[game.currentRoll.length - 1][i].value,
-          blocked: true,
         };
       } else {
         newRoll[i] = {
           value: rand(),
-          blocked: false,
         };
       }
     }
