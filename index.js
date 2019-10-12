@@ -83,7 +83,11 @@ function processMessage(payload, userID) {
     game.players.push({ name: payload.name, id: userID, score: {} });
   } else if (payload.type === 'score') {
     let idx = game.players.findIndex(e => e.id === userID);
-    game.players[idx].score[payload.cat] = payload.score;
+    game.players[idx].score[payload.cat] = {
+      score: payload.score,
+      rolls: game.currentRoll,
+    };
+    game.players[idx].lastTurn = payload.cat
     game.currentRoll = []
     game.currentPlayer = nextPlayer();
   } else if (payload.type === 'roll') {
