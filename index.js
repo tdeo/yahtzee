@@ -16,11 +16,14 @@ const wsServer = new webSocketServer({
 });
 
 let clients = {};
-let game = {
+
+const newGame = () => ({
+  chat: [],
   players: [],
   currentRoll: [],
   currentPlayer: null,
-};
+});
+var game = newGame();
 
 function rand() {
   return 1 + Math.floor(6 * Math.random());
@@ -71,23 +74,27 @@ function broadcast() {
 }
 
 function processMessage(payload, userID) {
+  let playerIdx = game.players.findIndex(e => e.id === userID);
+  let player = game.players[playerIdx];
+
   if (payload.type === 'reset') {
-    game = {
-      players: [],
-      currentRoll: [],
-      currentPlayer: null,
-    };
+    game = newGame();
+  } else if (payload.type === 'postMessage') {
+    game.chat.push({
+      message: payload.message,
+      playerName:  player.name,
+      timestamp: Date.now(),
+    });
   } else if (payload.type === 'player') {
     game.players[payload.idx].id = userID;
   } else if (payload.type === 'newPlayer') {
     game.players.push({ name: payload.name, id: userID, score: {} });
   } else if (payload.type === 'score') {
-    let idx = game.players.findIndex(e => e.id === userID);
-    game.players[idx].score[payload.cat] = {
+    player.score[payload.cat] = {
       score: payload.score,
       rolls: game.currentRoll,
     };
-    game.players[idx].lastTurn = payload.cat
+    player.lastTurn = payload.cat
     game.currentRoll = []
     game.currentPlayer = nextPlayer();
   } else if (payload.type === 'roll') {
